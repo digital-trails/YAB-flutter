@@ -20,12 +20,13 @@ class _AnimatedSplashOverlayState extends State<AnimatedSplashOverlay>
 
   // Opacity holds at 1 until 20%, then fades to 0 by 70%.
   late final Animation<double> _opacity = TweenSequence<double>([
-    TweenSequenceItem(tween: ConstantTween(1), weight: 20),
+    TweenSequenceItem(tween: ConstantTween<double>(1.0), weight: 20),
     TweenSequenceItem(
-      tween: Tween(begin: 1, end: 0).chain(CurveTween(curve: Curves.easeOut)),
+      tween: Tween<double>(begin: 1.0, end: 0.0)
+          .chain(CurveTween(curve: Curves.easeOut)),
       weight: 50,
     ),
-    TweenSequenceItem(tween: ConstantTween(0), weight: 30),
+    TweenSequenceItem(tween: ConstantTween<double>(0.0), weight: 30),
   ]).animate(_controller);
 
   // Scale eases from a large initial factor down to 1.

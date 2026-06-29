@@ -26,7 +26,14 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.44.4
           cache: true
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Generate web platform files
         run: flutter create . --platforms=web
@@ -35,7 +42,7 @@ jobs:
         run: flutter pub get
 
       - name: Build
-        run: flutter build web --release --base-href "/YAB-flutter/"
+        run: flutter build web --release --base-href "${{ steps.pages.outputs.base_path }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

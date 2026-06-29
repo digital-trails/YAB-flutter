@@ -6,6 +6,7 @@ import 'screens/profile_screen.dart';
 import 'screens/settings_screen.dart';
 import 'theme.dart';
 import 'widgets/animated_splash.dart';
+import 'widgets/phone_frame.dart';
 
 void main() => runApp(const YabApp());
 
@@ -20,7 +21,7 @@ class YabApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: _buildTheme(AppColors.light, Brightness.light),
       darkTheme: _buildTheme(AppColors.dark, Brightness.dark),
-      home: const RootShell(),
+      home: const PhoneFrame(child: RootShell()),
     );
   }
 

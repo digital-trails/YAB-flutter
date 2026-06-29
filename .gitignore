@@ -119,3 +119,6 @@ app.*.symbols
 !/dev/ci/**/Gemfile.lock
 # macOS
 .DS_Store
+
+# Local Flutter SDK installed by setup_flutter.sh
+/flutter_sdk/
