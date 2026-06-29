@@ -1,123 +1,114 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import 'screens/explore_screen.dart';
+import 'screens/home_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/settings_screen.dart';
+import 'theme.dart';
+import 'widgets/animated_splash.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+void main() => runApp(const YabApp());
+
+class YabApp extends StatelessWidget {
+  const YabApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'YAB Flutter',
+      title: 'YAB',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
-      home: const HomePage(),
+      themeMode: ThemeMode.system,
+      theme: _buildTheme(AppColors.light, Brightness.light),
+      darkTheme: _buildTheme(AppColors.dark, Brightness.dark),
+      home: const RootShell(),
+    );
+  }
+
+  ThemeData _buildTheme(AppColors c, Brightness brightness) {
+    return ThemeData(
+      brightness: brightness,
+      scaffoldBackgroundColor: c.background,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: kSplashColor,
+        brightness: brightness,
+      ).copyWith(surface: c.background),
+      useMaterial3: true,
     );
   }
 }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+/// Holds the tab state and overlays the animated splash on first launch.
+/// Mirrors the Tabs layout + AnimatedSplashOverlay in src/app/_layout.tsx.
+class RootShell extends StatefulWidget {
+  const RootShell({super.key});
+
+  @override
+  State<RootShell> createState() => _RootShellState();
+}
+
+class _RootShellState extends State<RootShell> {
+  int _index = 0;
+
+  static const _screens = [
+    HomeScreen(),
+    ExploreScreen(),
+    ProfileScreen(),
+    SettingsScreen(),
+  ];
+
+  static const _tabs = [
+    _TabSpec('Home', Icons.home, Icons.home_outlined),
+    _TabSpec('Explore', Icons.search, Icons.search_outlined),
+    _TabSpec('Profile', Icons.person, Icons.person_outline),
+    _TabSpec('Settings', Icons.settings, Icons.settings_outlined),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+      body: Stack(
+        children: [
+          IndexedStack(index: _index, children: _screens),
+          const AnimatedSplashOverlay(),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(
-              Icons.flutter_dash,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Welcome to YAB Flutter!',
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'This is a minimal two-screen Flutter app.',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AboutPage()),
-                );
-              },
-              icon: const Icon(Icons.info_outline),
-              label: const Text('Go to About'),
-            ),
-          ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: colors.background,
+          border: Border(top: BorderSide(color: colors.backgroundElement)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: BottomNavigationBar(
+            currentIndex: _index,
+            onTap: (i) => setState(() => _index = i),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: colors.background,
+            elevation: 0,
+            selectedItemColor: colors.text,
+            unselectedItemColor: colors.textSecondary,
+            selectedFontSize: 10,
+            unselectedFontSize: 10,
+            items: [
+              for (var i = 0; i < _tabs.length; i++)
+                BottomNavigationBarItem(
+                  label: _tabs[i].label,
+                  icon: Icon(_tabs[i].outline),
+                  activeIcon: Icon(_tabs[i].filled),
+                ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('About'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Icon(
-              Icons.info_outline,
-              size: 80,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'About YAB Flutter',
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'This app demonstrates basic navigation between two screens:\n'
-              '- A Home screen with a call to action\n'
-              '- An About screen with details',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Back to Home'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+class _TabSpec {
+  const _TabSpec(this.label, this.filled, this.outline);
+  final String label;
+  final IconData filled;
+  final IconData outline;
 }
